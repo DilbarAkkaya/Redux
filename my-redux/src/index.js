@@ -1,55 +1,29 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { legacy_createStore as createStore } from 'redux';
+import {inc, dec, rnd} from './actions.js';
+import reducer from './reducer';
 
-const initialState = {
-  value: 0
-};
-const reducer = (state = initialState, action)=>{
-switch (action.type) {
-  case 'INC':
-  return {
-    ...state,
-    value: state.value + 1,
-  }
-  case 'DEC':
-    return {
-      ...state,
-      value: state.value - 1,
-    }
-    case 'RND':
-      return {
-        ...state,
-        value: state.value * action.payload,
-      }
-  default:
-  return state;
-}
-}
-
-const inc = ()=>({type: 'INC' });
-const dec = ()=>({type: 'DEC' });
-const rnd = (value)=>({type: 'RND' , payload: value});
 const store= createStore(reducer);
+const { dispatch, subscribe, getState } = store;
 const update = ()=>{
-  document.getElementById('counter').textContent = store.getState().value;
+  document.getElementById('counter').textContent = getState().value;
 }
-store.subscribe(update);
-document.getElementById('inc').addEventListener('click', ()=>{
-  store.dispatch(inc());
-})
-document.getElementById('dec').addEventListener('click', ()=>{
-  store.dispatch(dec());
-})
+const bindActionCreator = (creator, dispatch)=> (...args)=> {
+  dispatch(creator(...args))
+}
+const incDispatch = bindActionCreator(inc, dispatch);
+const decDispatch = bindActionCreator(dec, dispatch);
+const rndDispatch = bindActionCreator(rnd, dispatch)
+subscribe(update);
+document.getElementById('inc').addEventListener('click', incDispatch);
+
+document.getElementById('dec').addEventListener('click', decDispatch);
+
 document.getElementById('rnd').addEventListener('click', ()=>{
   const value = Math.floor(Math.random() * 10);
-  store.dispatch(rnd(value));
+  rndDispatch(value);
 })
-/* 
-let state = reducer(initialState, {type: 'INC'});
-state = reducer(state, {type: 'INC'});
-console.log(state) */
-
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
