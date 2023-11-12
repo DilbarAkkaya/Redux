@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { legacy_createStore as createStore } from 'redux';
-import {inc, dec, rnd} from './actions.js';
+import { legacy_createStore as createStore, bindActionCreators } from 'redux';
+import * as actions  from './actions.js';
 import reducer from './reducer';
 
 const store= createStore(reducer);
@@ -9,20 +9,20 @@ const { dispatch, subscribe, getState } = store;
 const update = ()=>{
   document.getElementById('counter').textContent = getState().value;
 }
-const bindActionCreator = (creator, dispatch)=> (...args)=> {
+/* const bindActionCreator = (creator, dispatch)=> (...args)=> {
   dispatch(creator(...args))
-}
-const incDispatch = bindActionCreator(inc, dispatch);
-const decDispatch = bindActionCreator(dec, dispatch);
-const rndDispatch = bindActionCreator(rnd, dispatch)
+} */
+const {inc, dec,rnd} = bindActionCreators(actions, dispatch);
+/* const decDispatch = bindActionCreators(dec, dispatch);
+const rndDispatch = bindActionCreators(rnd, dispatch) */
 subscribe(update);
-document.getElementById('inc').addEventListener('click', incDispatch);
+document.getElementById('inc').addEventListener('click', inc);
 
-document.getElementById('dec').addEventListener('click', decDispatch);
+document.getElementById('dec').addEventListener('click', dec);
 
 document.getElementById('rnd').addEventListener('click', ()=>{
   const value = Math.floor(Math.random() * 10);
-  rndDispatch(value);
+  rnd(value);
 })
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
